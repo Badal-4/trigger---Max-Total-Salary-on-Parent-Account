@@ -32,7 +32,7 @@ public class trgController
         }
         
         List<AggregateResult> aggrList = [Select Account__c accId,sum(Salary__c) sumSalary,max(Salary__c) maxSalary
-                                         from Account_Salary__c where Account__c != null group by Account__c];
+                                         from Account_Salary__c where Account__c != null and Account__c IN : accIds group by Account__c];
         List<Account> accList = new List<Account>();
         
         if(!aggrList.isEmpty())
