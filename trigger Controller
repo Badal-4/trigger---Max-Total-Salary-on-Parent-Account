@@ -1,74 +1,13 @@
 public class trgController
 {
-    public static void trgMethod(List<Account_Salary__c> newList,List<Account_Salary__c> oldList,Map<Id,Account_Salary__c> oldMap)
-    {
-        Set<Id> accIds = new Set<Id>();
-        
-        if(newList != null &&  oldMap != null  && oldList == null)
-        {
-            for(Account_Salary__c acc : newList)
-            {
-                 Account_Salary__c oldAcc = oldMap.get(acc.Id);
-                if(acc.Account__c != oldAcc.Account__c)
-                {
-                    accIds.add(oldMap.get(acc.Id).Account__c);
-                }
-                if(acc.Account__c != null)
-                {
-                    accIds.add(acc.Account__c);
-                }
-            }
-        }
-        
-        else if(oldList != null && newList == null)
-        {
-            for(Account_Salary__c acc : oldList)
-            {
-                if(acc.Account__c != null)
-                {
-                    accIds.add(acc.Account__c);
-                }
-            }
-        }
-        
-        List<AggregateResult> aggrList = [Select Account__c accId,sum(Salary__c) sumSalary,max(Salary__c) maxSalary
-                                         from Account_Salary__c where Account__c != null and Account__c IN : accIds group by Account__c];
-        List<Account> accList = new List<Account>();
-        
-        if(!aggrList.isEmpty())
-        {
-            for(AggregateResult aggr : aggrList)
-            {
-                Id accountId = (Id)aggr.get('accId');
-                Account acct = new Account();
-                acct.Id = accountId;
-                acct.Max_Salary__c = (Decimal)aggr.get('maxSalary');
-                acct.Total_Salary__c = (Decimal)aggr.get('sumSalary');
-                accList.add(acct);
-            }
-        }
-        if(!accList.isEmpty())
-        {
-            update accList;
-        }
-    }
-}
-
-
-
-
-Website Method
-
-
-public with sharing class AccountSalaryHelper {
- 
-    public static void updateAccount(List<Account_Salary__c> newAccountSalaries, Map<Id, Account_Salary__c> oldMap){
+      public static void updateAccount(List<Account_Salary__c> newAccountSalaries, Map<Id, Account_Salary__c> oldMap){
         Set<Id> accountIds = new Set<Id>();
         for (Account_Salary__c newAccountSalary : newAccountSalaries){
             if (oldMap!=null){
                 Account_Salary__c oldAccountSalary = oldMap.get(newAccountSalary.Id);
-                if (oldAccountSalary.Salary__c != newAccountSalary.Salary__c){
+                if (oldAccountSalary.Account__c != newAccountSalary.Account__c){
                     accountIds.add(newAccountSalary.Account__c);
+                    accountIds.add(oldAccountSalary.Account__c);
                 }
             } else {
                 accountIds.add(newAccountSalary.Account__c);
@@ -99,5 +38,5 @@ public with sharing class AccountSalaryHelper {
                 }
             }
         }
-    }
+}
 }
