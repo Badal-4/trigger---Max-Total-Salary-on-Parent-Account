@@ -1,6 +1,7 @@
 public class trgController
 {
-      public static void updateAccount(List<Account_Salary__c> newAccountSalaries, Map<Id, Account_Salary__c> oldMap){
+    
+       public static void updateAccount(List<Account_Salary__c> newAccountSalaries, Map<Id, Account_Salary__c> oldMap){
         Set<Id> accountIds = new Set<Id>();
         for (Account_Salary__c newAccountSalary : newAccountSalaries){
             if (oldMap!=null){
@@ -8,6 +9,10 @@ public class trgController
                 if (oldAccountSalary.Account__c != newAccountSalary.Account__c){
                     accountIds.add(newAccountSalary.Account__c);
                     accountIds.add(oldAccountSalary.Account__c);
+                }
+                else 
+                {
+                     accountIds.add(newAccountSalary.Account__c);
                 }
             } else {
                 accountIds.add(newAccountSalary.Account__c);
@@ -38,5 +43,5 @@ public class trgController
                 }
             }
         }
-}
-}
+    }
+    }
