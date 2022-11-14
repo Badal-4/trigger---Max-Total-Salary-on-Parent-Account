@@ -45,3 +45,69 @@ public class trgController
         }
     }
     }
+
+
+
+
+////No records present trigger controller
+public class trgController
+{
+    public static void trgMethod(List<Account_Salary__c> newList,Map<Id,Account_Salary__c> oldMap)
+    {
+        Set<Id> accIds = new Set<Id>();
+        
+        for(Account_Salary__c newAcc : newList)
+        {
+            if(oldMap != null)
+            {
+                Account_Salary__c oldAcc = oldMap.get(newAcc.Id);
+                
+                if(oldAcc.Account__c != newAcc.Account__c)
+                {
+                    accIds.add(oldAcc.Account__c);
+                    accIds.add(newAcc.Account__c);
+                }
+                else 
+                {
+                    accIds.add(newAcc.Account__c);
+                }
+            }
+            else
+            {
+                accIds.add(newAcc.Account__c);
+            }
+        }
+        
+        List<AggregateResult> aggrList = [Select Account__c accId,max(Salary__c) maxSalary,min(Salary__c) minSalary,sum(Salary__c) totalSalary from Account_Salary__c
+                                         where Account__c != null and Account__c IN : accIds group by Account__c];
+        Map<Id,Account> accMap = new Map<Id,Account>();
+        
+        for(Id acId : accIds)
+        {
+            Account acc = new Account();
+            acc.Id = acId;
+            acc.Max_Salary__c = 0;
+            acc.Min_Salary__c = 0;
+            acc.Total_Salary__c = 0;
+            accMap.put(acc.Id,acc);
+        }
+        
+        if(aggrList.size() > 0)
+        {
+            for(AggregateResult aggr : aggrList)
+            {
+                Account acct = new Account();
+                acct.Id = (Id)aggr.get('accId');
+                acct.Max_Salary__c = (Decimal)aggr.get('maxSalary');
+                acct.Min_Salary__c = (Decimal)aggr.get('minSalary');
+                acct.Total_Salary__c = (Decimal)aggr.get('totalSalary');
+                accMap.put(acct.Id,acct);
+            }
+        }
+        
+        if(accMap != null)
+        {
+            update accMap.values();
+        }
+    }
+}
